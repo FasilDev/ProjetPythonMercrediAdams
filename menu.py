@@ -87,12 +87,12 @@ def afficher_menu(screen):
 
 
 def afficher_pause(screen):
-    """Menu pause avec le même style que le menu principal"""
+    # Menu pause
     largeur, hauteur = screen.get_size()
     
     # Overlay semi-transparent
     overlay = pygame.Surface((largeur, hauteur))
-    overlay.set_alpha(180)
+    overlay.set_alpha(150)
     overlay.fill((0, 0, 0))
     
     font_titre = pygame.font.Font("assets/fonts/Creepster-Regular.ttf", 80)
@@ -126,9 +126,10 @@ def afficher_pause(screen):
                     return "continuer"
                 if bouton_quitter.collidepoint(souris_x, souris_y):
                     return "quit"
+                
+        screen.blit(background_capture, (0, 0)) 
+        screen.blit(overlay, (0, 0))        
         
-        # Afficher l'overlay
-        screen.blit(overlay, (0, 0))
         
         # Titre "PAUSE"
         texte_pause = font_titre.render("PAUSE", True, (255, 255, 255))

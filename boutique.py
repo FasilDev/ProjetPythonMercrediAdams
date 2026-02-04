@@ -7,7 +7,7 @@ def afficher_boutique(screen):
     fond_boutique = pygame.image.load("assets/boutique/Boutique_Wednesday.webp").convert()
     fond_boutique = pygame.transform.scale(fond_boutique, (largeur, hauteur))
     
-    font = pygame.font.Font("assets/Creepster-Regular.ttf", 25)
+    font = pygame.font.Font("assets/fonts/Creepster-Regular.ttf", 25)
     
     # Définition des 4 objets
     items = [
@@ -20,13 +20,13 @@ def afficher_boutique(screen):
     # Position des items
     
     boutons_items = [
-        pygame.Rect(150, 300, 150, 80),  
-        pygame.Rect(500, 300, 150, 80),  
-        pygame.Rect(150, 420, 150, 80),   
-        pygame.Rect(500, 420, 150, 80)   
+        pygame.Rect(250, 300, 150, 80),  
+        pygame.Rect(600, 300, 150, 80),  
+        pygame.Rect(250, 420, 150, 80),   
+        pygame.Rect(600, 420, 150, 80)   
     ]
     
-    # Bouton RETOUR (en bas de l'écran)
+    # Bouton RETOUR
     bouton_retour = pygame.Rect(largeur // 2 - 100, hauteur - 80, 200, 50)
     
     item_selectionne = None  # Pour savoir quel item est sélectionné
@@ -39,13 +39,13 @@ def afficher_boutique(screen):
                 return "quit"
             
             if event.type == pygame.MOUSEBUTTONDOWN:
-                # Vérifie si on clique sur un item
+                
                 for i, bouton in enumerate(boutons_items):
                     if bouton.collidepoint(souris_x, souris_y):
                         item_selectionne = items[i]
-                        print(f"✅ Sélectionné : {item_selectionne['nom']} - {item_selectionne['effet']}")
+                        print(f"Sélectionné : {item_selectionne['nom']} - {item_selectionne['effet']}")
                 
-                # Vérifie si on clique sur RETOUR
+                
                 if bouton_retour.collidepoint(souris_x, souris_y):
                     return "menu"
         
@@ -54,32 +54,32 @@ def afficher_boutique(screen):
         
         # Affichage des 4 items dans la vitrine
         for i, (bouton, item) in enumerate(zip(boutons_items, items)):
-            # Zones cliquables semi-transparentes
+            
             s = pygame.Surface((bouton.width, bouton.height))
             
             # Change de couleur si la souris est dessus
             if bouton.collidepoint(souris_x, souris_y):
-                s.set_alpha(100)  # Plus visible au survol
-                s.fill((255, 200, 100))  # Orange clair
+                s.set_alpha(100)  
+                s.fill((255, 200, 100))  
             else:
-                s.set_alpha(50)   # Plus transparent normalement
-                s.fill((80, 40, 100))  # Violet foncé
+                s.set_alpha(50)  
+                s.fill((80, 40, 100)) 
             
             screen.blit(s, (bouton.x, bouton.y))
             
-            # Bordure pour mieux voir la zone
+            
             pygame.draw.rect(screen, (150, 100, 180), bouton, 2)
             
-            # Texte de l'item (juste le nom, petit)
+            
             texte = font.render(item["nom"], True, (255, 255, 255))
             screen.blit(texte, (bouton.x + 10, bouton.y + 25))
         
-        # Affichage de l'item sélectionné en haut de l'écran
+        
         if item_selectionne:
             texte_selection = font.render(f"Choisi: {item_selectionne['nom']}", True, (255, 200, 100))
             screen.blit(texte_selection, (largeur // 2 - texte_selection.get_width() // 2, 30))
             
-            # Description de l'effet
+            
             font_petit = pygame.font.Font(None, 20)
             texte_effet = font_petit.render(item_selectionne['effet'], True, (200, 200, 200))
             screen.blit(texte_effet, (largeur // 2 - texte_effet.get_width() // 2, 65))

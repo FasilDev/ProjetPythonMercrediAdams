@@ -33,7 +33,7 @@ class Player(pygame.sprite.Sprite):
         # Saut
         self.ground_y = 380  # Position du sol
         self.vel_y = 0       # Vitesse verticale
-        self.jump_speed = -20  # Force du saut (négatif = vers le haut)
+        self.jump_speed = -17  # Force du saut (négatif = vers le haut)
         self.gravity = 0.8   # Gravité
 
         self.image = pygame.Surface((self.walk_w, self.walk_h), pygame.SRCALPHA)

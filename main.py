@@ -1,8 +1,7 @@
 import pygame
 from sprites import Player, Obstacle
-from menu import afficher_menu
-from boutique import afficher_boutique
 from menu import afficher_menu, afficher_pause
+from boutique import afficher_boutique
 
 FPS = 60
 
@@ -11,25 +10,27 @@ def main():
     pygame.mixer.init()
 
     # Taille de base du jeu
-    screen = pygame.display.set_mode((0, 0), pygame.FULLSCREEN)
-    WIDTH, HEIGHT = screen.get_size()
+    screen = pygame.display.set_mode((800, 450))
     pygame.display.set_caption("Mercredi Addams - Runner")
 
-
-    # Menu
-    choix = afficher_menu(screen)
-    if choix == "quit":
-        pygame.quit()
-        return
-    
-    # Boutique
-    elif choix == "boutique":
-        afficher_boutique(screen)
+    # Boucle pour gérer menu et boutique
+    while True:
+        choix = afficher_menu(screen)
+        
         if choix == "quit":
             pygame.quit()
             return
+        
+        # Gestion de la boutique
+        elif choix == "boutique":
+            resultat = afficher_boutique(screen)
+            if resultat == "quit":
+                pygame.quit()
+                return
+        
+        elif choix == "jouer":
+            break 
     
-
     # Musique du jeu
     pygame.mixer.music.load("assets/Wednesday Addams  Dance.mp3")
     pygame.mixer.music.set_volume(0.5)
@@ -47,7 +48,7 @@ def main():
     player = Player()
     all_sprites = pygame.sprite.Group(player)
  
-    #Obstacles
+    # Obstacles
     obstacles = pygame.sprite.Group()
     speed = 2  # Utilise la même vitesse que le défilement
     for i in range(3):  # 3 obstacles
@@ -70,17 +71,24 @@ def main():
                 running = False
 
             if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_ESCAPE:
+                    background_capture = screen.copy()
+                    pygame.mixer.music.pause()
+                    choix_pause = afficher_pause(screen, background_capture)
+                    
+                    if choix_pause == "continuer":
+                        pygame.mixer.music.unpause()
+                    elif choix_pause == "quit":
+                        running = False
+                        
                 if event.key == pygame.K_DOWN:
                     player.set_animation("crouch")
                 elif event.key == pygame.K_SPACE:  # Saut avec ESPACE
                     player.jump()
 
-
             if event.type == pygame.KEYUP:
                 if event.key == pygame.K_DOWN:
                     player.set_animation("walk")
-
-                    
 
         # UPDATE
         bg_x -= speed
