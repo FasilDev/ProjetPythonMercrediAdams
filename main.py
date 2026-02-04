@@ -9,8 +9,8 @@ def main():
     pygame.init()
     pygame.mixer.init()
 
-    # Taille de base du jeu
-    screen = pygame.display.set_mode((800, 450))
+    # Taille de base du jeu 
+    screen = pygame.display.set_mode((800, 450), pygame.RESIZABLE)
     pygame.display.set_caption("Mercredi Addams - Runner")
 
     # Boucle pour gérer menu et boutique
@@ -39,10 +39,9 @@ def main():
     # Fond du jeu
     background = pygame.image.load("assets/bgmercredi.jpg").convert()
 
-    # Adapter la fenêtre à la taille du fond
+    # Taille du fond 
     WIDTH = background.get_width()
     HEIGHT = background.get_height()
-    screen = pygame.display.set_mode((WIDTH, HEIGHT))
 
     # Joueur
     player = Player()
@@ -50,8 +49,8 @@ def main():
  
     # Obstacles
     obstacles = pygame.sprite.Group()
-    speed = 2  # Utilise la même vitesse que le défilement
-    for i in range(3):  # 3 obstacles
+    speed = 2
+    for i in range(3):
         obs = Obstacle(speed + i * 0.5)
         obstacles.add(obs)
         all_sprites.add(obs) 
@@ -59,18 +58,33 @@ def main():
     clock = pygame.time.Clock()
 
     bg_x = 0
-    speed = 2
     running = True
 
     while running:
         clock.tick(FPS)
+
+        # Récupérer la taille actuelle de la fenêtre
+        screen_width, screen_height = screen.get_size()
 
         # EVENTS
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
 
+            # Gestion du redimensionnement de fenêtre
+            if event.type == pygame.VIDEORESIZE:
+                screen = pygame.display.set_mode((event.w, event.h), pygame.RESIZABLE)
+
             if event.type == pygame.KEYDOWN:
+                # F11 pour basculer en plein écran
+                if event.key == pygame.K_F11:
+                    if screen.get_flags() & pygame.FULLSCREEN:
+                        # Sortir du plein écran
+                        screen = pygame.display.set_mode((800, 450), pygame.RESIZABLE)
+                    else:
+                        # Passer en plein écran
+                        screen = pygame.display.set_mode((0, 0), pygame.FULLSCREEN)
+                
                 if event.key == pygame.K_ESCAPE:
                     background_capture = screen.copy()
                     pygame.mixer.music.pause()
@@ -83,7 +97,7 @@ def main():
                         
                 if event.key == pygame.K_DOWN:
                     player.set_animation("crouch")
-                elif event.key == pygame.K_SPACE:  # Saut avec ESPACE
+                elif event.key == pygame.K_SPACE:
                     player.jump()
 
             if event.type == pygame.KEYUP:
@@ -98,9 +112,21 @@ def main():
         all_sprites.update()
 
         # RENDER
-        screen.blit(background, (bg_x, 0))
-        screen.blit(background, (bg_x + background.get_width(), 0))
-        all_sprites.draw(screen)
+        # Calculer les offsets pour centrer le jeu
+        offset_x = (screen_width - WIDTH) // 2
+        offset_y = (screen_height - HEIGHT) // 2
+        
+        # Fond noir pour les bandes
+        screen.fill((0, 0, 0))
+        
+        # Dessiner le fond centré
+        screen.blit(background, (bg_x + offset_x, offset_y))
+        screen.blit(background, (bg_x + background.get_width() + offset_x, offset_y))
+        
+        # Dessiner les sprites avec le décalage
+        for sprite in all_sprites:
+            screen.blit(sprite.image, (sprite.rect.x + offset_x, sprite.rect.y + offset_y))
+        
         pygame.display.flip()
 
     pygame.quit()

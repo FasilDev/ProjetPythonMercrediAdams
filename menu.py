@@ -1,5 +1,5 @@
 import pygame
-    
+
 def afficher_menu(screen):
     largeur, hauteur = screen.get_size()
 
@@ -58,13 +58,13 @@ def afficher_menu(screen):
                     pygame.mixer.music.stop()
                     return "quit"
 
-        # 🔹 Animation du menu
+        # Animation du menu
         now = pygame.time.get_ticks()
         if now - last_anim >= anim_delay:
             last_anim = now
             frame_index = (frame_index + 1) % len(frames)
 
-        # 🔹 Affichage
+        # Affichage
         screen.blit(frames[frame_index], (0, 0))
 
         # Boutons
@@ -86,7 +86,7 @@ def afficher_menu(screen):
         pygame.display.flip()
 
 
-def afficher_pause(screen):
+def afficher_pause(screen, background_capture):
     # Menu pause
     largeur, hauteur = screen.get_size()
     
