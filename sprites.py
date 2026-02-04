@@ -33,13 +33,23 @@ class Player(pygame.sprite.Sprite):
         # Saut
         self.ground_y = 380  # Position du sol
         self.vel_y = 0       # Vitesse verticale
-        self.jump_speed = -17  # Force du saut (négatif = vers le haut)
-        self.gravity = 0.8   # Gravité
+        self.jump_speed = -12  # Force initiale du saut (un peu plus haut)
+        self.gravity = 0.8   # Gravite
+
+        # Saut variable (maintenir espace pour sauter plus haut)
+        self.is_jumping = False
+        self.jump_held = False
+        self.jump_hold_time = 0
+        self.max_jump_hold = 15  # Frames max pour maintenir le saut
+        self.jump_boost = -0.8   # Boost par frame quand on maintient
 
         self.image = pygame.Surface((self.walk_w, self.walk_h), pygame.SRCALPHA)
         self.rect = self.image.get_rect()
         self.rect.x = 60
         self.rect.y = self.ground_y
+
+        # Hitbox pour les collisions
+        self.hitbox = self.rect.inflate(-20, -10)
 
     def set_animation(self, anim_type):
         if anim_type == "crouch":
@@ -48,19 +58,58 @@ class Player(pygame.sprite.Sprite):
             self.is_crouching = False
 
     def jump(self):
-        # Saut uniquement si on est au sol
-        if self.rect.bottom >= self.ground_y - 1:
+        # Saut uniquement si on est au sol ou sur une plateforme
+        if not self.is_jumping:
             self.vel_y = self.jump_speed
+            self.is_jumping = True
+            self.jump_held = True
+            self.jump_hold_time = 0
 
-    def update(self):
-        #Appliquer la gravité
+    def jump_hold(self):
+        # Maintenir le saut pour sauter plus haut
+        if self.is_jumping and self.jump_held and self.jump_hold_time < self.max_jump_hold:
+            self.vel_y += self.jump_boost
+            self.jump_hold_time += 1
+
+    def jump_release(self):
+        # Relacher le saut
+        self.jump_held = False
+
+    def is_out_of_screen(self):
+        # Verifier si le joueur sort de l'ecran (gauche ou bas)
+        return self.rect.right < 0 or self.rect.top > HEIGHT
+
+    def update(self, platforms=None):
+        # Maintenir le saut si la touche est enfoncee
+        if self.jump_held and self.is_jumping:
+            self.jump_hold()
+
+        # Sauvegarder position avant mouvement
+        old_bottom = self.rect.bottom
+
+        # Appliquer la gravite
         self.vel_y += self.gravity
         self.rect.y += self.vel_y
-        
+
+        # Collision avec les plateformes (seulement en descendant)
+        self.on_platform = False
+        if platforms and self.vel_y > 0:
+            for platform in platforms:
+                # Collision simple : si on touche la plateforme
+                if self.rect.colliderect(platform.rect):
+                    # Verifier qu'on vient du dessus (pas du cote)
+                    if old_bottom <= platform.rect.centery:
+                        self.rect.bottom = platform.rect.top
+                        self.vel_y = 0
+                        self.is_jumping = False
+                        self.on_platform = True
+                        break
+
         # Ne pas traverser le sol
         if self.rect.bottom > self.ground_y:
             self.rect.bottom = self.ground_y
             self.vel_y = 0
+            self.is_jumping = False
         
         # Animation
         self.timer += 1
@@ -93,27 +142,48 @@ class Player(pygame.sprite.Sprite):
             self.rect.x = old_x
             self.rect.y = old_y
 
+        # Mettre a jour la hitbox
+        self.hitbox = self.rect.inflate(-20, -10)
+        self.hitbox.center = self.rect.center
+
 
 class Obstacle(pygame.sprite.Sprite):
-    def __init__(self, speed):
+    # Variable de classe pour suivre le dernier type d'obstacle
+    last_type = None
+    last_x = 0
+
+    def __init__(self, speed, x_offset=0):
         super().__init__()
 
-        # Choisir une image au hasard
-        img_path = random.choice([SPIDER_IMG, HYDE_IMG, CORBEAU_IMG])
+        # Choisir un type d'obstacle (tous les types)
+        if Obstacle.last_type == "air":
+            # Apres un corbeau, obstacle au sol
+            img_path = random.choice([SPIDER_IMG, HYDE_IMG])
+            Obstacle.last_type = "ground"
+        else:
+            # Sinon, un des trois types
+            img_path = random.choice([SPIDER_IMG, HYDE_IMG, CORBEAU_IMG])
+            Obstacle.last_type = "air" if img_path == CORBEAU_IMG else "ground"
 
+        self.img_path = img_path
         image = pygame.image.load(img_path).convert_alpha()
-        self.image = pygame.transform.smoothscale(image, (64, 64))  # ajuste la taille
+        self.image = pygame.transform.smoothscale(image, (55, 55))
         self.rect = self.image.get_rect()
-        self.hitbox = self.rect.inflate(-20, -20)
+        self.hitbox = self.rect.inflate(-15, -15)
 
         self.speed = speed
-        # Position différente selon le type d'obstacle
+
+        # Position Y selon le type
         if img_path == CORBEAU_IMG:
-            self.rect.bottom = HEIGHT - 150
+            # Corbeau en l'air - assez haut pour passer dessous
+            self.rect.bottom = HEIGHT - 250
         else:
+            # Araignee et Hyde au sol
             self.rect.bottom = HEIGHT - 70
 
-        self.rect.left = WIDTH + random.randint(100, 500)
+        # Position X avec espacement
+        self.rect.left = WIDTH + x_offset + random.randint(200, 350)
+        Obstacle.last_x = self.rect.left
 
     def update(self):
         self.rect.x -= self.speed
@@ -124,21 +194,31 @@ class Obstacle(pygame.sprite.Sprite):
 
 
     def reset(self):
-        img_path = random.choice([SPIDER_IMG, HYDE_IMG, CORBEAU_IMG])
-        image = pygame.image.load(img_path).convert_alpha()
-        self.image = pygame.transform.smoothscale(image, (64, 64))
-        self.rect = self.image.get_rect(center=self.rect.center)
+        # Choisir un type (eviter 2 corbeaux de suite)
+        if Obstacle.last_type == "air":
+            img_path = random.choice([SPIDER_IMG, HYDE_IMG])
+            Obstacle.last_type = "ground"
+        else:
+            img_path = random.choice([SPIDER_IMG, HYDE_IMG, CORBEAU_IMG])
+            Obstacle.last_type = "air" if img_path == CORBEAU_IMG else "ground"
 
-        # Position différente selon le type d'obstacle
+        self.img_path = img_path
+        image = pygame.image.load(img_path).convert_alpha()
+        self.image = pygame.transform.smoothscale(image, (55, 55))
+        self.rect = self.image.get_rect()
+
+        # Position Y selon le type
         if img_path == CORBEAU_IMG:
-            self.rect.bottom = HEIGHT - 150  # Corbeau vole plus haut
+            self.rect.bottom = HEIGHT - 250
         else:
             self.rect.bottom = HEIGHT - 70
 
-        self.rect.left = WIDTH + random.randint(200, 600)
+        # Espacement
+        min_x = max(WIDTH, Obstacle.last_x) + random.randint(300, 450)
+        self.rect.left = min_x
+        Obstacle.last_x = self.rect.left
 
-        self.hitbox = self.rect.inflate(-20, -20)
+        self.hitbox = self.rect.inflate(-15, -15)
         self.hitbox.center = self.rect.center
 
-        # Augmenter la vitesse pour la difficulté
         self.speed = min(self.speed + 0.1, 10)            
