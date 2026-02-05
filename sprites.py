@@ -8,7 +8,6 @@ WIDTH, HEIGHT = 800, 450
 # Dossier des assets
 ASSETS = Path(__file__).parent / "assets"
 SPIDER_IMG = ASSETS / "spider.webp"
-HYDE_IMG = ASSETS / "hyde_sprite.png"
 HYDE_SHEET = ASSETS / "hyde_sprite.png"   
 HYDE_FRAME_W = 265
 HYDE_FRAME_H = 415
@@ -144,9 +143,7 @@ class Obstacle(pygame.sprite.Sprite):
         super().__init__()
 
         self.speed = speed
-
-        #si obstacle bougent = animation 
-        self.is_animated = (self.speed > 0)
+        self.x_offset = x_offset
 
         # Animation Hyde
         self.hyde_sheet = None
@@ -154,34 +151,31 @@ class Obstacle(pygame.sprite.Sprite):
         self.hyde_last = 0
         self.hyde_delay = 90
 
-        self.set_type()
+        # Init (spawn de départ)
+        self.reset(first=True)
 
-        # Position Y - Hyde au sol
-        self.rect.bottom = HEIGHT - 40
+    def set_type(self, img_path):
+        # animé seulement si ça bouge
+        self.is_animated = (self.speed > 0)
 
-        # Position X
-        self.rect.left = WIDTH + x_offset + random.randint(200, 350)
-        Obstacle.last_x = self.rect.left
-
-    def set_type(self):
-        """Charge Hyde statique ou animé"""
-        
-        if self.is_animated:
-            # Hyde ANIMÉ (avec sprite sheet)
+        # HYDE (sprite-sheet)
+        if img_path == HYDE_SHEET:
+            self.is_hyde = True
             self.hyde_sheet = pygame.image.load(HYDE_SHEET).convert_alpha()
             self.hyde_i = 0
             self.hyde_last = 0
-            self.image = self.get_hyde_frame(self.hyde_i)
+            self.image = self.get_hyde_frame(0)
+
+        # SPIDER / CORBEAU (image simple)
         else:
-            # Hyde STATIQUE (juste la première pose)
-            self.hyde_sheet = pygame.image.load(HYDE_SHEET).convert_alpha()
-            self.image = self.get_hyde_frame(0)  # Toujours la frame 0
+            self.is_hyde = False
+            image = pygame.image.load(img_path).convert_alpha()
+            self.image = pygame.transform.smoothscale(image, (55, 55))
 
         self.rect = self.image.get_rect()
         self.hitbox = self.rect.inflate(-15, -15)
 
     def get_hyde_frame(self, i):
-        """Découpe une frame dans la sheet Hyde."""
         x = i * HYDE_FRAME_W
         frame = pygame.Surface((HYDE_FRAME_W, HYDE_FRAME_H), pygame.SRCALPHA)
         frame.blit(self.hyde_sheet, (0, 0), (x, 0, HYDE_FRAME_W, HYDE_FRAME_H))
@@ -191,8 +185,8 @@ class Obstacle(pygame.sprite.Sprite):
     def update(self):
         self.rect.x -= self.speed
 
-        # Animation SEULEMENT si Hyde est animé
-        if self.is_animated:
+        # Animation SEULEMENT si Hyde et si obstacle bouge
+        if self.is_hyde and self.is_animated:
             now = pygame.time.get_ticks()
             if now - self.hyde_last >= self.hyde_delay:
                 self.hyde_last = now
@@ -208,22 +202,32 @@ class Obstacle(pygame.sprite.Sprite):
         if self.rect.right < 0:
             self.reset()
 
-    def reset(self):
-        # Rechoisir aléatoirement statique ou animé
-        self.is_animated = (self.speed > 0)
-        
-        self.set_type()
+    def reset(self, first=False):
+        # Choisir un type (éviter 2 corbeaux de suite)
+        if Obstacle.last_type == "air":
+            img_path = random.choice([SPIDER_IMG, HYDE_SHEET])
+            Obstacle.last_type = "ground"
+        else:
+            img_path = random.choice([SPIDER_IMG, HYDE_SHEET, CORBEAU_IMG])
+            Obstacle.last_type = "air" if img_path == CORBEAU_IMG else "ground"
 
-        # Position Y - Hyde au sol
-        self.rect.bottom = HEIGHT - 40
+        self.img_path = img_path
+        self.set_type(img_path)
 
-        # Espacement
-        min_x = max(WIDTH, Obstacle.last_x) + random.randint(300, 450)
-        self.rect.left = min_x
+        # Position Y selon type
+        if img_path == CORBEAU_IMG:
+            self.rect.bottom = HEIGHT - 250
+        else:
+            self.rect.bottom = HEIGHT - 70
+
+        # Position X
+        if first:
+            self.rect.left = WIDTH + self.x_offset + random.randint(200, 350)
+        else:
+            self.rect.left = max(WIDTH, Obstacle.last_x) + random.randint(300, 450)
+
         Obstacle.last_x = self.rect.left
 
-        self.hitbox = self.rect.inflate(-15, -15)
-        self.hitbox.center = self.rect.center
-
-        # Augmenter la vitesse
-        self.speed = min(self.speed + 0.1, 10)
+        # Augmenter vitesse seulement si ça bouge
+        if (not first) and self.speed > 0:
+            self.speed = min(self.speed + 0.1, 10)
