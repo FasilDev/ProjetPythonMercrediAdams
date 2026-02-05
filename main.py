@@ -4,15 +4,23 @@ from menu import afficher_menu, afficher_pause
 from boutique import afficher_boutique
 from score import Score
 from health_bar import HealthBar
-from platform import Platform
+from my_platform import Platform
 from coin import Coin
 from game_over import afficher_game_over
 
 FPS = 60
 
+def jouer(screen, bg_easy, bg_hard):
+    # Son de collision
+    try:
+        hit_sound = pygame.mixer.Sound("assets/Crie.wav")
+        hit_sound.set_volume(0.4)
+    except:
+        hit_sound = None
+        print("Impossible de charger Crie.wav")
 
-def jouer(screen, background):
-    """Lance une partie et retourne le choix a la fin (rejouer/menu/quit)"""
+    level = "easy"
+    background = bg_easy
 
     # Taille du fond
     WIDTH = background.get_width()
@@ -20,7 +28,11 @@ def jouer(screen, background):
 
     # Joueur
     player = Player()
-    all_sprites = pygame.sprite.Group(player)
+
+    all_sprites = pygame.sprite.Group()
+    all_sprites.add(player)
+
+    obstacles = pygame.sprite.Group()
 
     # Score et barre de vie
     score = Score(x=10, y=10)
@@ -30,9 +42,8 @@ def jouer(screen, background):
     speed = 4
 
     # Obstacles (3 obstacles avec tous les types)
-    Obstacle.last_type = None
-    Obstacle.last_x = 0
-    obstacles = pygame.sprite.Group()
+    speed = 2
+
     for i in range(3):
         obs = Obstacle(speed, x_offset=i * 350)
         obstacles.add(obs)
@@ -125,10 +136,15 @@ def jouer(screen, background):
         health_bar.update()
 
         # Collision avec les obstacles
+        collision_detected = False
         for obs in obstacles:
             if player.hitbox.colliderect(obs.hitbox):
                 if health_bar.take_damage(20):
                     pass
+                # Son de cri (une seule fois par frame)
+                if hit_sound and not collision_detected:
+                    hit_sound.play()
+                    collision_detected = True
 
         # Collision avec les pieces
         for coin in coins:
@@ -138,6 +154,23 @@ def jouer(screen, background):
 
         # Augmenter le score avec le temps
         score.add(1)
+
+        # Passage automatique en difficile à 2000
+        if level == "easy" and score.value >= 2000:
+            level = "hard"
+            background = bg_hard
+            bg_x = 0  # optionnel : repart proprement
+
+            # difficulté : vitesse + rapide
+            speed = 6
+
+            # appliquer la nouvelle vitesse aux éléments
+            for obs in obstacles:
+                obs.speed = 6
+            for plat in platforms:
+                plat.set_speed(6)
+            for coin in coins:
+                coin.set_speed(6)
 
         # Augmenter la vitesse progressivement
         speed_timer += 1
@@ -186,7 +219,6 @@ def main():
 
     # Boucle principale du jeu
     while True:
-        # Menu principal
         choix = afficher_menu(screen)
 
         if choix == "quit":
@@ -199,16 +231,15 @@ def main():
             continue
 
         elif choix == "jouer":
-            # Charger la musique et le fond
             pygame.mixer.music.load("assets/Wednesday Addams  Dance.mp3")
             pygame.mixer.music.set_volume(0.5)
             pygame.mixer.music.play(-1)
 
-            background = pygame.image.load("assets/bgmercredi.jpg").convert()
+            bg_easy = pygame.image.load("assets/bgmercredi1.webp").convert()
+            bg_hard = pygame.image.load("assets/bgmercredi.jpg").convert()
 
-            # Boucle de jeu (permet de rejouer)
             while True:
-                resultat, score_final = jouer(screen, background)
+                resultat, score_final = jouer(screen, bg_easy, bg_hard)
 
                 if resultat == "quit":
                     pygame.quit()

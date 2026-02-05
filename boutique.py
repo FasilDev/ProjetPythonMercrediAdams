@@ -14,6 +14,14 @@ def afficher_boutique(screen):
     img_violon = pygame.image.load(ASSETS / "boutique" / "Violon_boutique.webp").convert_alpha()
     img_grimoire = pygame.image.load(ASSETS / "boutique" / "Grimoire_boutique.webp").convert_alpha()
 
+    # Son de cash
+    try:
+        cash_sound = pygame.mixer.Sound("assets/cash.wav")
+        cash_sound.set_volume(0.7)
+    except:
+        cash_sound = None
+        print("Impossible de charger cash.wav")
+
     # Definition des items avec leurs images
     items = [
         {"nom": "Bougie", "effet": "Ralentit obstacles 10s", "prix": 50, "image": img_bougie},
@@ -89,6 +97,9 @@ def afficher_boutique(screen):
                 for i, bouton in enumerate(boutons_items):
                     if bouton.collidepoint(souris_x, souris_y):
                         item_selectionne = items[i]
+                        #Son du cash
+                        if cash_sound:
+                            cash_sound.play()
 
                 if bouton_retour.collidepoint(souris_x, souris_y):
                     return "menu"

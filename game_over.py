@@ -7,7 +7,15 @@ FONT_PATH = ASSETS / "fonts" / "Creepster-Regular.ttf"
 
 def afficher_game_over(screen, score_final):
     """Affiche l'ecran Game Over et retourne le choix du joueur"""
-
+    # Charger le son Game Over
+    try:
+        game_over_sound = pygame.mixer.Sound("assets/Game Over.wav")
+        game_over_sound.set_volume(0.7)
+        game_over_sound.play()
+    except:
+        game_over_sound = None
+        print("Impossible de charger Game Over.wav")
+        
     clock = pygame.time.Clock()
 
     # Polices
