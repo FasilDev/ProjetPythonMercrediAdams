@@ -26,6 +26,9 @@ def jouer(screen, bg_easy, bg_hard):
     WIDTH = background.get_width()
     HEIGHT = background.get_height()
 
+    son_touche_m = pygame.mixer.Sound("assets/Mercredi Addams soundplay.wav")
+    son_touche_m.set_volume(1.5)
+
     # Joueur
     player = Player()
 
@@ -104,6 +107,9 @@ def jouer(screen, bg_easy, bg_hard):
                         pygame.mixer.music.unpause()
                     elif choix_pause == "quit":
                         return "menu", score.value
+
+                if event.key == pygame.K_m:
+                        son_touche_m.play()
 
                 if event.key == pygame.K_DOWN:
                     player.set_animation("crouch")
