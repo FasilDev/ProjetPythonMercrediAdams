@@ -1,4 +1,5 @@
 import pygame
+import random
 from pathlib import Path
 from personnages import Joueur, Obstacle
 from menu import afficher_menu, afficher_pause
@@ -52,12 +53,16 @@ def jouer(screen, bg_easy, bg_hard):
     police_pieces = pygame.font.Font(ASSETS / "fonts" / "Creepster-Regular.ttf", 24)
 
     # Vitesse de base
-    speed = 2
+    speed = 3.5
 
-    for i in range(3):
+    for i in range(2):
         obs = Obstacle(speed, x_offset=i * 350)
         obstacles.add(obs)
         all_sprites.add(obs)
+
+    # Seuils de score pour ajouter des obstacles
+    seuils_obstacles = [800, 1800, 3000, 4500]
+    prochain_seuil = 0
 
     # Plateformes 
     platforms = pygame.sprite.Group()
@@ -169,7 +174,6 @@ def jouer(screen, bg_easy, bg_hard):
             coin.speed = old_speed * (0.5 if inventaire.effet_est_actif("bougie") else 1)
             coin.update()
             coin.speed = old_speed
-
         # Mise a jour de la barre de vie
         health_bar.mise_a_jour()
 
@@ -180,11 +184,10 @@ def jouer(screen, bg_easy, bg_hard):
                 if player.hitbox.colliderect(obs.hitbox):
                     if health_bar.subir_degats(20):
                         pass
-                    # Son de cri (une seule fois par frame)
                     if hit_sound and not collision_detected:
+                        hit_sound.set_volume(parametres.volume_effets)
                         hit_sound.play()
                         collision_detected = True
-
         # Collision avec les pieces
         for coin in coins:
             if not coin.collectee and player.hitbox.colliderect(coin.rect):
@@ -197,34 +200,40 @@ def jouer(screen, bg_easy, bg_hard):
         else:
             score.add(1)
 
+        # Ajouter des obstacles progressivement
+        if prochain_seuil < len(seuils_obstacles) and score.value >= seuils_obstacles[prochain_seuil]:
+            new_obs = Obstacle(speed, x_offset=random.randint(200, 400))
+            obstacles.add(new_obs)
+            all_sprites.add(new_obs)
+            prochain_seuil += 1
+
         # Passage automatique en difficile a 2000
-        if level == "easy" and score.value >= 2500:
+        if level == "easy" and score.value >= 2000:
             level = "hard"
             background = bg_hard
             bg_x = 0
 
-            speed = 6
+            speed = max(speed, 6)
 
             for obs in obstacles:
-                obs.speed = 6
+                obs.speed = max(obs.speed, 6)
             for plat in platforms:
-                plat.set_speed(6)
+                plat.set_speed(max(plat.speed, 6))
             for coin in coins:
-                coin.set_speed(6)
+                coin.set_speed(max(coin.speed, 6))
 
         # Augmenter la vitesse progressivement
         speed_timer += 1
         if speed_timer >= speed_increase_interval:
             speed_timer = 0
-            speed = min(speed + 0.4, 10)
+            speed = min(speed + 0.3, 12)
 
             for obs in obstacles:
-                obs.speed = min(obs.speed + 0.4, 12)
+                obs.speed = min(obs.speed + 0.3, 14)
             for plat in platforms:
                 plat.set_speed(speed)
             for coin in coins:
                 coin.set_speed(speed)
-
         # Verifier si le joueur est mort ou sort de l'ecran
         if health_bar.est_mort() or player.is_out_of_screen():
             donnees_joueur.ajouter_pieces(pieces_collectees)
@@ -255,6 +264,10 @@ def jouer(screen, bg_easy, bg_hard):
         # Afficher le compteur de pieces (en haut a droite)
         texte_pieces = police_pieces.render(f"Pieces: {pieces_collectees} (+{donnees_joueur.pieces})", True, (255, 215, 0))
         screen.blit(texte_pieces, (offset_x + WIDTH - texte_pieces.get_width() - 10, offset_y + 10))
+
+        # Afficher le record (en haut a droite, sous les pieces)
+        texte_record = police_pieces.render(f"Record: {donnees_joueur.meilleur_score}", True, (200, 170, 200))
+        screen.blit(texte_record, (offset_x + WIDTH - texte_record.get_width() - 10, offset_y + 35))
 
         # Afficher l'inventaire
         inventaire.dessiner(screen, offset_x, offset_y)

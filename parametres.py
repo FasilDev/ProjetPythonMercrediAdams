@@ -58,6 +58,7 @@ class Parametres:
 
     def definir_volume_musique(self, volume):
         self.volume_musique = max(0, min(1, volume))
+        self.volume_effets = self.volume_musique
         pygame.mixer.music.set_volume(self.volume_musique)
         self.sauvegarder()
 

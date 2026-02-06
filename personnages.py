@@ -158,6 +158,8 @@ class Obstacle(pygame.sprite.Sprite):
         self.hyde_delay = 90
         self.hyde_mobile = False
         self.hyde_vitesse_extra = 0
+        self.araignee_vitesse_extra = 0
+        self.corbeau_vitesse_extra = 0
 
         # Animation Corbeau
         self.corbeau_sheet = None
@@ -187,8 +189,8 @@ class Obstacle(pygame.sprite.Sprite):
             self.hyde_sheet = pygame.image.load(HYDE_SHEET).convert_alpha()
             self.hyde_i = 0
             self.hyde_last = 0
-            self.hyde_mobile = random.choice([True, False])
-            self.hyde_vitesse_extra = 2 if self.hyde_mobile else 0
+            self.hyde_mobile = True
+            self.hyde_vitesse_extra = 2
             self.image = self.get_hyde_frame(self.hyde_i)
             self.rect = self.image.get_rect()
             self.rect.bottom = HEIGHT - 60
@@ -198,6 +200,7 @@ class Obstacle(pygame.sprite.Sprite):
             self.image = pygame.transform.smoothscale(image, (55, 55))
             self.rect = self.image.get_rect()
             self.rect.bottom = HEIGHT - 70
+            self.araignee_vitesse_extra = 1.5
 
         elif self.obstacle_type == "corbeau":
             self.corbeau_sheet = pygame.image.load(CORBEAU_IMG).convert_alpha()
@@ -206,6 +209,7 @@ class Obstacle(pygame.sprite.Sprite):
             self.image = self.get_corbeau_frame(self.corbeau_i)
             self.rect = self.image.get_rect()
             self.rect.bottom = HEIGHT - 250
+            self.corbeau_vitesse_extra = 1
 
         # Hitbox reduite
         self.hitbox = self.rect.inflate(-25, -25)
@@ -229,8 +233,12 @@ class Obstacle(pygame.sprite.Sprite):
     def update(self):
         # Deplacement
         vitesse_totale = self.speed
-        if self.obstacle_type == "hyde" and self.hyde_mobile:
+        if self.obstacle_type == "hyde":
             vitesse_totale += self.hyde_vitesse_extra
+        elif self.obstacle_type == "araignee":
+            vitesse_totale += self.araignee_vitesse_extra
+        elif self.obstacle_type == "corbeau":
+            vitesse_totale += self.corbeau_vitesse_extra
 
         self.rect.x -= vitesse_totale
 
@@ -277,4 +285,4 @@ class Obstacle(pygame.sprite.Sprite):
         self.hitbox.center = self.rect.center
 
         # Augmenter la vitesse
-        self.speed = min(self.speed + 0.1, 10)
+        self.speed = min(self.speed + 0.05, 10)

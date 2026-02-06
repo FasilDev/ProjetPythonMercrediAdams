@@ -29,8 +29,8 @@ class Piece(pygame.sprite.Sprite):
             self.rect.x = x
 
         if y is None:
-            # Position aleatoire en hauteur
-            self.rect.y = random.randint(HEIGHT - 250, HEIGHT - 100)
+            # Position aleatoire en hauteur (au-dessus du sol)
+            self.rect.y = random.randint(HEIGHT - 280, HEIGHT - 140)
         else:
             self.rect.y = y
 
@@ -77,8 +77,8 @@ class Piece(pygame.sprite.Sprite):
 
     def reinitialiser(self):
         self.rect.x = WIDTH + random.randint(100, 400)
-        # Hauteurs variees : sol, milieu, ou en hauteur
-        hauteurs = [HEIGHT - 100, HEIGHT - 150, HEIGHT - 200, HEIGHT - 280]
+        # Hauteurs variees : milieu ou en hauteur (au-dessus du sol)
+        hauteurs = [HEIGHT - 140, HEIGHT - 180, HEIGHT - 220, HEIGHT - 280]
         self.rect.y = random.choice(hauteurs)
         self.collectee = False
         self.timer = 0

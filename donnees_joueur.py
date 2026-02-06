@@ -7,6 +7,7 @@ FICHIER_SAUVEGARDE = Path(__file__).parent / "sauvegarde.json"
 class DonneesJoueur:
     def __init__(self):
         self.pieces = 0
+        self.meilleur_score = 0
         self.objets = {
             "bougie": 0,
             "araignee": 0,
@@ -22,6 +23,7 @@ class DonneesJoueur:
                 with open(FICHIER_SAUVEGARDE, "r") as f:
                     donnees = json.load(f)
                     self.pieces = donnees.get("pieces", 0)
+                    self.meilleur_score = donnees.get("meilleur_score", 0)
                     self.objets = donnees.get("objets", self.objets)
             except:
                 pass
@@ -30,6 +32,7 @@ class DonneesJoueur:
         """Sauvegarder les donnees dans le fichier"""
         donnees = {
             "pieces": self.pieces,
+            "meilleur_score": self.meilleur_score,
             "objets": self.objets
         }
         with open(FICHIER_SAUVEGARDE, "w") as f:
@@ -39,6 +42,14 @@ class DonneesJoueur:
         """Ajouter des pieces"""
         self.pieces += montant
         self.sauvegarder()
+
+    def verifier_record(self, score):
+        """Verifie et met a jour le meilleur score. Retourne True si nouveau record."""
+        if score > self.meilleur_score:
+            self.meilleur_score = score
+            self.sauvegarder()
+            return True
+        return False
 
     def depenser_pieces(self, montant):
         """Depenser des pieces (retourne True si succes)"""

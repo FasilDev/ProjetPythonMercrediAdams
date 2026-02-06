@@ -3,6 +3,7 @@ import os
 import math
 from pathlib import Path
 from parametres import parametres, NOMS_TOUCHES
+from donnees_joueur import donnees_joueur
 
 ASSETS = Path(__file__).parent / "assets"
 
@@ -192,6 +193,13 @@ def afficher_menu(ecran):
                        bouton_parametres.collidepoint(souris_x, souris_y))
         dessiner_bouton(ecran, bouton_quitter, "QUITTER", police,
                        bouton_quitter.collidepoint(souris_x, souris_y))
+
+        # Afficher le meilleur score
+        if donnees_joueur.meilleur_score > 0:
+            taille_record = max(20, int(hauteur * 0.04))
+            police_record = pygame.font.Font(ASSETS / "fonts" / "Creepster-Regular.ttf", taille_record)
+            texte_record = police_record.render(f"Record: {donnees_joueur.meilleur_score}", True, (255, 215, 0))
+            ecran.blit(texte_record, (centre_x - texte_record.get_width() // 2, int(hauteur * 0.92)))
 
         pygame.display.flip()
 
@@ -403,7 +411,7 @@ def afficher_parametres(ecran):
         ecran.blit(titre, rect_titre)
 
         # Section Volume
-        label_vol = police.render("Volume Musique", True, (220, 200, 220))
+        label_vol = police.render("Volume", True, (220, 200, 220))
         ecran.blit(label_vol, (centre_x - label_vol.get_width() // 2, y_curseur - 35))
 
         # Fond du curseur

@@ -1,5 +1,6 @@
 import pygame
 from pathlib import Path
+from donnees_joueur import donnees_joueur
 
 ASSETS = Path(__file__).parent / "assets"
 CHEMIN_POLICE = ASSETS / "fonts" / "Creepster-Regular.ttf"
@@ -18,9 +19,14 @@ def afficher_fin_partie(ecran, score_final):
 
     horloge = pygame.time.Clock()
 
+    # Verifier si nouveau record
+    nouveau_record = donnees_joueur.verifier_record(score_final)
+    meilleur_score = donnees_joueur.meilleur_score
+
     # Polices
     police_titre = pygame.font.Font(CHEMIN_POLICE, 72)
     police_score = pygame.font.Font(CHEMIN_POLICE, 36)
+    police_record = pygame.font.Font(CHEMIN_POLICE, 28)
     police_bouton = pygame.font.Font(CHEMIN_POLICE, 32)
 
     # Couleurs
@@ -56,8 +62,18 @@ def afficher_fin_partie(ecran, score_final):
 
         # Score final
         texte_score = police_score.render(f"Score: {score_final}", True, couleur_texte)
-        rect_score = texte_score.get_rect(center=(largeur_ecran // 2, hauteur_ecran // 2 - 20))
+        rect_score = texte_score.get_rect(center=(largeur_ecran // 2, hauteur_ecran // 2 - 40))
         ecran.blit(texte_score, rect_score)
+
+        # Meilleur score / nouveau record
+        if nouveau_record:
+            texte_record = police_record.render("NOUVEAU RECORD !", True, (255, 215, 0))
+            rect_record = texte_record.get_rect(center=(largeur_ecran // 2, hauteur_ecran // 2))
+            ecran.blit(texte_record, rect_record)
+        else:
+            texte_record = police_record.render(f"Record: {meilleur_score}", True, (200, 170, 200))
+            rect_record = texte_record.get_rect(center=(largeur_ecran // 2, hauteur_ecran // 2))
+            ecran.blit(texte_record, rect_record)
 
         # Boutons
         largeur_bouton = 200
