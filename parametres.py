@@ -25,7 +25,7 @@ class Parametres:
     def __init__(self):
         # Valeurs par defaut
         self.volume_musique = 0.5
-        self.volume_effets = 0.7
+        self.volume_effets = 0.6
 
         # Touches pour les objets (par defaut 1, 2, 3, 4)
         self.touches_objets = [pygame.K_1, pygame.K_2, pygame.K_3, pygame.K_4]
@@ -39,7 +39,7 @@ class Parametres:
                 with open(FICHIER_PARAMETRES, "r") as f:
                     donnees = json.load(f)
                     self.volume_musique = donnees.get("volume_musique", 0.5)
-                    self.volume_effets = donnees.get("volume_effets", 0.7)
+                    self.volume_effets = donnees.get("volume_effets", 0.6)
                     # Charger les touches
                     touches = donnees.get("touches_objets", [pygame.K_1, pygame.K_2, pygame.K_3, pygame.K_4])
                     self.touches_objets = [int(t) for t in touches]
