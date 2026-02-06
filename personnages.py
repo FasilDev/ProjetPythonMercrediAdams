@@ -12,7 +12,10 @@ HYDE_SHEET = ASSETS / "hyde_sprite.png"
 HYDE_FRAME_W = 265
 HYDE_FRAME_H = 415
 HYDE_FRAMES = 2
-CORBEAU_IMG = ASSETS / "corbeau.webp"
+CORBEAU_IMG = ASSETS / "ravenfly.png"
+CORBEAU_FRAME_W = 64  # ✅ Corrigé (au lieu de 128)
+CORBEAU_FRAME_H = 64  # ✅ Hauteur correcte
+CORBEAU_FRAMES = 4
 
 
 class Joueur(pygame.sprite.Sprite):
@@ -34,7 +37,7 @@ class Joueur(pygame.sprite.Sprite):
         self.est_accroupi = False
         self.timer = 0
 
-        # Saut (hauteur reduite)
+        # Saut
         self.sol_y = 380
         self.vel_y = 0
         self.vitesse_saut = -10
@@ -137,7 +140,6 @@ class Joueur(pygame.sprite.Sprite):
 
 
 class Obstacle(pygame.sprite.Sprite):
-    # Variable de classe pour suivre le dernier type d'obstacle
     dernier_type = None
     last_x = 0
 
@@ -149,13 +151,19 @@ class Obstacle(pygame.sprite.Sprite):
         # Type d'obstacle: "hyde", "araignee", "corbeau"
         self.obstacle_type = None
 
-        # Animation Hyde (toujours anime)
+        # Animation Hyde
         self.hyde_sheet = None
         self.hyde_i = 0
         self.hyde_last = 0
         self.hyde_delay = 90
-        self.hyde_mobile = False  # Si Hyde se deplace (plus rapide)
-        self.hyde_vitesse_extra = 0  # Vitesse supplementaire si mobile
+        self.hyde_mobile = False
+        self.hyde_vitesse_extra = 0
+
+        # Animation Corbeau
+        self.corbeau_sheet = None
+        self.corbeau_i = 0
+        self.corbeau_last = 0
+        self.corbeau_delay = 100  # ✅ Un peu plus lent pour mieux voir l'animation
 
         self.set_type()
 
@@ -168,10 +176,8 @@ class Obstacle(pygame.sprite.Sprite):
 
         # Eviter deux corbeaux de suite
         if Obstacle.dernier_type == "corbeau":
-            # Apres un corbeau, obstacle au sol uniquement
             self.obstacle_type = random.choice(["hyde", "araignee"])
         else:
-            # Sinon, un des trois types
             self.obstacle_type = random.choice(["hyde", "araignee", "corbeau"])
 
         Obstacle.dernier_type = self.obstacle_type
@@ -181,26 +187,27 @@ class Obstacle(pygame.sprite.Sprite):
             self.hyde_sheet = pygame.image.load(HYDE_SHEET).convert_alpha()
             self.hyde_i = 0
             self.hyde_last = 0
-            # Hyde est toujours anime, mais parfois il se deplace (obstacle mobile)
             self.hyde_mobile = random.choice([True, False])
-            self.hyde_vitesse_extra = 2 if self.hyde_mobile else 0  # Vitesse supplementaire
+            self.hyde_vitesse_extra = 2 if self.hyde_mobile else 0
             self.image = self.get_hyde_frame(self.hyde_i)
             self.rect = self.image.get_rect()
-            self.rect.bottom = HEIGHT - 60  # Au sol (surelevee)
+            self.rect.bottom = HEIGHT - 60
 
         elif self.obstacle_type == "araignee":
             image = pygame.image.load(SPIDER_IMG).convert_alpha()
             self.image = pygame.transform.smoothscale(image, (55, 55))
             self.rect = self.image.get_rect()
-            self.rect.bottom = HEIGHT - 70  # Au sol
+            self.rect.bottom = HEIGHT - 70
 
         elif self.obstacle_type == "corbeau":
-            image = pygame.image.load(CORBEAU_IMG).convert_alpha()
-            self.image = pygame.transform.smoothscale(image, (55, 55))
+            self.corbeau_sheet = pygame.image.load(CORBEAU_IMG).convert_alpha()
+            self.corbeau_i = 0
+            self.corbeau_last = 0
+            self.image = self.get_corbeau_frame(self.corbeau_i)
             self.rect = self.image.get_rect()
-            self.rect.bottom = HEIGHT - 250  # En l'air (passer dessous)
+            self.rect.bottom = HEIGHT - 250
 
-        # Hitbox reduite pour plus de tolerance
+        # Hitbox reduite
         self.hitbox = self.rect.inflate(-25, -25)
 
     def get_hyde_frame(self, i):
@@ -210,16 +217,24 @@ class Obstacle(pygame.sprite.Sprite):
         frame.blit(self.hyde_sheet, (0, 0), (x, 0, HYDE_FRAME_W, HYDE_FRAME_H))
         frame = pygame.transform.smoothscale(frame, (90, 135))
         return frame
+    
+    def get_corbeau_frame(self, i):
+        """Decoupe une frame dans la sheet Corbeau."""
+        x = i * CORBEAU_FRAME_W
+        frame = pygame.Surface((CORBEAU_FRAME_W, CORBEAU_FRAME_H), pygame.SRCALPHA)
+        frame.blit(self.corbeau_sheet, (0, 0), (x, 0, CORBEAU_FRAME_W, CORBEAU_FRAME_H))
+        frame = pygame.transform.smoothscale(frame, (80, 80))  # ✅ Taille carrée pour garder les proportions
+        return frame
 
     def update(self):
-        # Deplacement normal + vitesse extra si Hyde mobile
+        # Deplacement
         vitesse_totale = self.speed
         if self.obstacle_type == "hyde" and self.hyde_mobile:
             vitesse_totale += self.hyde_vitesse_extra
 
         self.rect.x -= vitesse_totale
 
-        # Animation TOUJOURS active pour Hyde
+        # Animation Hyde
         if self.obstacle_type == "hyde":
             now = pygame.time.get_ticks()
             if now - self.hyde_last >= self.hyde_delay:
@@ -230,7 +245,18 @@ class Obstacle(pygame.sprite.Sprite):
                 self.image = self.get_hyde_frame(self.hyde_i)
                 self.rect = self.image.get_rect(center=old_center)
 
-        # Hitbox reduite pour plus de tolerance
+        # Animation Corbeau
+        if self.obstacle_type == "corbeau":
+            now = pygame.time.get_ticks()
+            if now - self.corbeau_last >= self.corbeau_delay:
+                self.corbeau_last = now
+                self.corbeau_i = (self.corbeau_i + 1) % CORBEAU_FRAMES
+
+                old_center = self.rect.center
+                self.image = self.get_corbeau_frame(self.corbeau_i)
+                self.rect = self.image.get_rect(center=old_center)
+
+        # Hitbox
         self.hitbox = self.rect.inflate(-25, -25)
         self.hitbox.center = self.rect.center
 
@@ -246,7 +272,7 @@ class Obstacle(pygame.sprite.Sprite):
         self.rect.left = min_x
         Obstacle.last_x = self.rect.left
 
-        # Hitbox reduite pour plus de tolerance
+        # Hitbox
         self.hitbox = self.rect.inflate(-25, -25)
         self.hitbox.center = self.rect.center
 

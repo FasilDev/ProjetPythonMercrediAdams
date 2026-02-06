@@ -56,7 +56,7 @@ def jouer(screen, bg_easy, bg_hard):
         obstacles.add(obs)
         all_sprites.add(obs)
 
-    # Plateformes (2 plateformes seulement, bien espacees)
+    # Plateformes 
     platforms = pygame.sprite.Group()
     for i in range(2):
         plat = Plateforme(speed, niveau=i, x_offset=i * 500)
@@ -192,7 +192,7 @@ def jouer(screen, bg_easy, bg_hard):
             score.add(1)
 
         # Passage automatique en difficile a 2000
-        if level == "easy" and score.value >= 2000:
+        if level == "easy" and score.value >= 2500:
             level = "hard"
             background = bg_hard
             bg_x = 0
