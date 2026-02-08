@@ -81,5 +81,4 @@ class DonneesJoueur:
         return self.objets.get(nom_objet, 0)
 
 
-# Instance globale
 donnees_joueur = DonneesJoueur()

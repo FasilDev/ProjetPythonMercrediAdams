@@ -22,43 +22,39 @@ class Piece(pygame.sprite.Sprite):
 
         self.rect = self.image.get_rect()
 
-        # Position initiale
         if x is None:
             self.rect.x = WIDTH + random.randint(100, 600)
         else:
             self.rect.x = x
 
         if y is None:
-            # Position aleatoire en hauteur (au-dessus du sol)
             self.rect.y = random.randint(HEIGHT - 280, HEIGHT - 140)
         else:
             self.rect.y = y
 
         self.collectee = False
-        self.valeur = 10  # Valeur de la piece
+        self.valeur = 10  
 
     def _dessiner_piece(self):
         self.image.fill((0, 0, 0, 0))
 
-        # Couleurs de la piece (style dore/bronze)
+        # Couleurs de la piece
         centre = self.taille // 2
 
-        # Animation simple : la piece "pulse"
         pulse = abs(self.frame - 2)
         rayon = centre - 2 - pulse
 
-        # Cercle exterieur (bordure)
         pygame.draw.circle(self.image, (180, 140, 50), (centre, centre), rayon + 2)
-        # Cercle interieur (piece)
+
         pygame.draw.circle(self.image, (255, 200, 80), (centre, centre), rayon)
-        # Reflet
+
         pygame.draw.circle(self.image, (255, 230, 150), (centre - 2, centre - 2), rayon // 3)
 
     def update(self):
         # Les pieces collectees reapparaissent apres un delai
         if self.collectee:
             self.timer += 1
-            if self.timer >= 120:  # 2 secondes a 60 FPS
+            if self.timer >= 120: 
                 self.reinitialiser()
             return
 
@@ -77,7 +73,7 @@ class Piece(pygame.sprite.Sprite):
 
     def reinitialiser(self):
         self.rect.x = WIDTH + random.randint(100, 400)
-        # Hauteurs variees : milieu ou en hauteur (au-dessus du sol)
+        # Hauteurs variees 
         hauteurs = [HEIGHT - 140, HEIGHT - 180, HEIGHT - 220, HEIGHT - 280]
         self.rect.y = random.choice(hauteurs)
         self.collectee = False
@@ -85,8 +81,8 @@ class Piece(pygame.sprite.Sprite):
 
     def collecter(self):
         self.collectee = True
-        self.timer = 0  # Reset timer pour reapparition
-        self.rect.x = -100  # Cacher la piece
+        self.timer = 0  
+        self.rect.x = -100  
         return self.valeur
 
     def set_speed(self, vitesse):

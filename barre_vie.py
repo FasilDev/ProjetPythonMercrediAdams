@@ -16,10 +16,9 @@ class BarreVie:
         self.couleur_vie = (180, 0, 0)
         self.couleur_vie_basse = (255, 0, 0)
 
-        # Invincibilite temporaire apres degats
         self.invincible = False
         self.timer_invincible = 0
-        self.duree_invincible = 60  # 1 seconde a 60 FPS
+        self.duree_invincible = 60  
 
     def subir_degats(self, montant=20):
         if not self.invincible:
@@ -50,7 +49,6 @@ class BarreVie:
         x = self.x + offset_x
         y = self.y + offset_y
 
-        # Fond de la barre
         pygame.draw.rect(ecran, self.couleur_fond, (x, y, self.largeur, self.hauteur))
 
         # Barre de vie
@@ -63,12 +61,10 @@ class BarreVie:
         else:
             couleur = self.couleur_vie
 
-        # Clignotement si invincible
         if self.invincible and self.timer_invincible % 10 < 5:
             couleur = (255, 255, 255)
 
         if largeur_vie > 0:
             pygame.draw.rect(ecran, couleur, (x, y, largeur_vie, self.hauteur))
 
-        # Bordure
         pygame.draw.rect(ecran, self.couleur_bordure, (x, y, self.largeur, self.hauteur), 2)

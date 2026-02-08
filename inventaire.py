@@ -16,10 +16,10 @@ class Inventaire:
             "grimoire": pygame.image.load(ASSETS / "boutique" / "Grimoire_boutique.webp").convert_alpha()
         }
 
-        # Ordre des emplacements (touches configurables dans parametres)
+        # Ordre des emplacements
         self.emplacements = ["bougie", "araignee", "violon", "grimoire"]
 
-        # Taille des emplacements
+        # Taille
         self.taille_emplacement = 50
         self.espacement = 5
 
@@ -28,13 +28,13 @@ class Inventaire:
 
         # Effets actifs
         self.effets_actifs = {
-            "bougie": {"actif": False, "timer": 0, "duree": 600},      # 10s a 60 FPS
+            "bougie": {"actif": False, "timer": 0, "duree": 600},      # ralenti
             "araignee": {"actif": False, "timer": 0, "duree": 180},    # 3s invincibilite
             "violon": {"actif": False, "timer": 0, "duree": 900},      # 15s double score
             "grimoire": {"actif": False, "timer": 0, "duree": 1}       # Instantane
         }
 
-        # Cooldowns (temps avant de pouvoir reutiliser un objet)
+        # temps avant de pouvoir reutiliser un objet
         self.cooldowns = {
             "bougie": {"timer": 0, "duree": 300},      # 5s de cooldown
             "araignee": {"timer": 0, "duree": 600},    # 10s de cooldown
@@ -49,7 +49,6 @@ class Inventaire:
 
         cle_objet = self.emplacements[index_emplacement]
 
-        # Verifier si on a l'objet, si l'effet n'est pas deja actif et si pas en cooldown
         if donnees_joueur.obtenir_nombre_objet(cle_objet) > 0:
             en_cooldown = self.cooldowns[cle_objet]["timer"] > 0
             if not en_cooldown:
@@ -67,10 +66,8 @@ class Inventaire:
                 effet["timer"] -= 1
                 if effet["timer"] <= 0:
                     effet["actif"] = False
-                    # Demarrer le cooldown quand l'effet se termine
                     self.cooldowns[cle]["timer"] = self.cooldowns[cle]["duree"]
 
-        # Mettre a jour les cooldowns
         for cle, cooldown in self.cooldowns.items():
             if cooldown["timer"] > 0:
                 cooldown["timer"] -= 1
@@ -91,10 +88,9 @@ class Inventaire:
         return None
 
     def dessiner(self, ecran, decalage_x=0, decalage_y=0):
-        """Dessiner la barre d'inventaire en bas au centre"""
+
         largeur_ecran, hauteur_ecran = ecran.get_size()
 
-        # Position de la barre (en bas au centre)
         largeur_totale = len(self.emplacements) * (self.taille_emplacement + self.espacement) - self.espacement
         debut_x = largeur_ecran // 2 - largeur_totale // 2
         debut_y = hauteur_ecran - self.taille_emplacement - 20
@@ -106,23 +102,20 @@ class Inventaire:
             # Fond de l'emplacement
             rect_emplacement = pygame.Rect(x, y, self.taille_emplacement, self.taille_emplacement)
 
-            # Couleur selon si l'effet est actif ou en cooldown
             if self.effets_actifs[cle_objet]["actif"]:
-                couleur_fond = (100, 200, 100, 150)  # Vert si actif
+                couleur_fond = (100, 200, 100, 150)  
             elif self.cooldowns[cle_objet]["timer"] > 0:
-                couleur_fond = (100, 50, 50, 180)    # Rouge si en cooldown
+                couleur_fond = (100, 50, 50, 180)    
             else:
                 couleur_fond = (40, 20, 40, 180)
 
-            # Dessiner le fond
             surface = pygame.Surface((self.taille_emplacement, self.taille_emplacement), pygame.SRCALPHA)
             surface.fill(couleur_fond)
             ecran.blit(surface, (x, y))
 
-            # Bordure
+            
             pygame.draw.rect(ecran, (100, 70, 100), rect_emplacement, 2)
 
-            # Image de l'objet
             nombre = donnees_joueur.obtenir_nombre_objet(cle_objet)
             if nombre > 0:
                 img = pygame.transform.smoothscale(self.images[cle_objet], (self.taille_emplacement - 8, self.taille_emplacement - 8))
@@ -137,13 +130,11 @@ class Inventaire:
             texte_touche = self.police.render(nom_touche, True, (255, 215, 0))
             ecran.blit(texte_touche, (x + 2, y + 2))
 
-            # Timer si effet actif
             if self.effets_actifs[cle_objet]["actif"]:
                 timer = self.effets_actifs[cle_objet]["timer"]
                 secondes = timer // 60
                 texte_timer = self.police.render(f"{secondes}s", True, (150, 255, 150))
                 ecran.blit(texte_timer, (x + self.taille_emplacement // 2 - texte_timer.get_width() // 2, y - 15))
-            # Timer si en cooldown
             elif self.cooldowns[cle_objet]["timer"] > 0:
                 timer = self.cooldowns[cle_objet]["timer"]
                 secondes = timer // 60 + 1  # Arrondir vers le haut

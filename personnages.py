@@ -13,8 +13,8 @@ HYDE_FRAME_W = 265
 HYDE_FRAME_H = 415
 HYDE_FRAMES = 2
 CORBEAU_IMG = ASSETS / "ravenfly.png"
-CORBEAU_FRAME_W = 64  # ✅ Corrigé (au lieu de 128)
-CORBEAU_FRAME_H = 64  # ✅ Hauteur correcte
+CORBEAU_FRAME_W = 64  
+CORBEAU_FRAME_H = 64  
 CORBEAU_FRAMES = 4
 
 
@@ -165,7 +165,7 @@ class Obstacle(pygame.sprite.Sprite):
         self.corbeau_sheet = None
         self.corbeau_i = 0
         self.corbeau_last = 0
-        self.corbeau_delay = 100  # ✅ Un peu plus lent pour mieux voir l'animation
+        self.corbeau_delay = 100
 
         self.set_type()
 
@@ -174,9 +174,7 @@ class Obstacle(pygame.sprite.Sprite):
         Obstacle.last_x = self.rect.left
 
     def set_type(self):
-        """Choisit aleatoirement un type d'obstacle"""
 
-        # Eviter deux corbeaux de suite
         if Obstacle.dernier_type == "corbeau":
             self.obstacle_type = random.choice(["hyde", "araignee"])
         else:
@@ -211,7 +209,6 @@ class Obstacle(pygame.sprite.Sprite):
             self.rect.bottom = HEIGHT - 250
             self.corbeau_vitesse_extra = 1
 
-        # Hitbox reduite
         self.hitbox = self.rect.inflate(-25, -25)
 
     def get_hyde_frame(self, i):
@@ -227,7 +224,7 @@ class Obstacle(pygame.sprite.Sprite):
         x = i * CORBEAU_FRAME_W
         frame = pygame.Surface((CORBEAU_FRAME_W, CORBEAU_FRAME_H), pygame.SRCALPHA)
         frame.blit(self.corbeau_sheet, (0, 0), (x, 0, CORBEAU_FRAME_W, CORBEAU_FRAME_H))
-        frame = pygame.transform.smoothscale(frame, (80, 80))  # ✅ Taille carrée pour garder les proportions
+        frame = pygame.transform.smoothscale(frame, (80, 80))
         return frame
 
     def update(self):
@@ -275,7 +272,6 @@ class Obstacle(pygame.sprite.Sprite):
         # Choisir un nouveau type
         self.set_type()
 
-        # Espacement
         min_x = max(WIDTH, Obstacle.last_x) + random.randint(300, 450)
         self.rect.left = min_x
         Obstacle.last_x = self.rect.left

@@ -43,12 +43,10 @@ def afficher_fin_partie(ecran, score_final):
     while en_cours:
         largeur_ecran, hauteur_ecran = ecran.get_size()
 
-        # Calculer le scale
         scale_x = largeur_ecran / LARGEUR_BASE
         scale_y = hauteur_ecran / HAUTEUR_BASE
         scale = min(scale_x, scale_y)
 
-        # Offset pour centrer
         offset_x = (largeur_ecran - LARGEUR_BASE * scale) // 2
         offset_y = (hauteur_ecran - HAUTEUR_BASE * scale) // 2
 
@@ -101,13 +99,13 @@ def afficher_fin_partie(ecran, score_final):
         survol_rejouer = rect_rejouer.collidepoint(pos_souris)
         survol_menu = rect_menu.collidepoint(pos_souris)
 
-        # Dessiner bouton Rejouer
+        # bouton Rejouer
         pygame.draw.rect(ecran, couleur_survol if survol_rejouer else couleur_bouton, rect_rejouer)
         pygame.draw.rect(ecran, couleur_texte, rect_rejouer, 2)
         texte_rejouer = police_bouton.render("REJOUER", True, couleur_texte)
         ecran.blit(texte_rejouer, texte_rejouer.get_rect(center=rect_rejouer.center))
 
-        # Dessiner bouton Menu
+        # bouton Menu
         pygame.draw.rect(ecran, couleur_survol if survol_menu else couleur_bouton, rect_menu)
         pygame.draw.rect(ecran, couleur_texte, rect_menu, 2)
         texte_menu = police_bouton.render("MENU", True, couleur_texte)

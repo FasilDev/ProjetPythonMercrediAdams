@@ -3,7 +3,7 @@ import random
 
 WIDTH, HEIGHT = 800, 450
 
-# Plateformes plus hautes (pas a ras du sol)
+# Plateformes plus hautes
 NIVEAUX_PLATEFORME = [
     HEIGHT - 160,   # Niveau bas
     HEIGHT - 230,   # Niveau haut
@@ -21,7 +21,6 @@ class Plateforme(pygame.sprite.Sprite):
         # Creer la surface de la plateforme
         self.image = pygame.Surface((self.largeur, self.hauteur), pygame.SRCALPHA)
 
-        # Style gothique pour la plateforme
         self.couleur = (60, 40, 60)
         self.couleur_bordure = (100, 70, 100)
         self.couleur_dessus = (90, 70, 90)
@@ -31,7 +30,7 @@ class Plateforme(pygame.sprite.Sprite):
         self.rect = self.image.get_rect()
         self.speed = vitesse
 
-        # Niveau de hauteur (0 ou 1 seulement)
+        # Niveau de hauteur
         if niveau is None:
             self.niveau = random.randint(0, 1)
         else:
@@ -39,7 +38,6 @@ class Plateforme(pygame.sprite.Sprite):
 
         self.rect.y = NIVEAUX_PLATEFORME[self.niveau]
 
-        # Position X avec offset pour bon espacement
         self.rect.x = WIDTH + x_offset + random.randint(50, 100)
 
     def _dessiner_plateforme(self):
@@ -61,14 +59,11 @@ class Plateforme(pygame.sprite.Sprite):
             self.reinitialiser()
 
     def reinitialiser(self):
-        # Alterner entre les 2 niveaux
         self.niveau = 1 - self.niveau
         self.rect.y = NIVEAUX_PLATEFORME[self.niveau]
 
-        # Grand espacement
         self.rect.x = WIDTH + random.randint(400, 600)
 
-        # Nouvelle largeur
         self.largeur = random.randint(100, 140)
         self.image = pygame.Surface((self.largeur, self.hauteur), pygame.SRCALPHA)
         self._dessiner_plateforme()

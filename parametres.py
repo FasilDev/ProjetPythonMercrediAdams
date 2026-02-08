@@ -23,7 +23,6 @@ NOMS_TOUCHES = {
 
 class Parametres:
     def __init__(self):
-        # Valeurs par defaut
         self.volume_musique = 0.5
         self.volume_effets = 0.6
 
@@ -71,5 +70,4 @@ class Parametres:
         return NOMS_TOUCHES.get(touche, "?")
 
 
-# Instance globale
 parametres = Parametres()

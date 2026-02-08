@@ -25,30 +25,24 @@ def dessiner_bouton(ecran, rect, texte, police, est_survole, est_selectionne=Fal
         couleur_bordure = (100, 60, 100)
         couleur_texte = (200, 180, 200)
 
-    # Ombre portee
     rect_ombre = rect.copy()
     rect_ombre.x += 4
     rect_ombre.y += 4
     pygame.draw.rect(ecran, (15, 5, 15), rect_ombre, border_radius=12)
 
-    # Fond du bouton
     pygame.draw.rect(ecran, couleur_fond, rect, border_radius=10)
 
-    # Effet de brillance en haut
     rect_brillance = pygame.Rect(rect.x + 2, rect.y + 2, rect.width - 4, rect.height // 3)
     surface_brillance = pygame.Surface((rect_brillance.width, rect_brillance.height), pygame.SRCALPHA)
     pygame.draw.rect(surface_brillance, (255, 255, 255, 20), (0, 0, rect_brillance.width, rect_brillance.height), border_radius=8)
     ecran.blit(surface_brillance, rect_brillance)
 
-    # Bordure
     pygame.draw.rect(ecran, couleur_bordure, rect, 2, border_radius=10)
 
-    # Texte centre
     surface_texte = police.render(texte, True, couleur_texte)
     rect_texte = surface_texte.get_rect(center=rect.center)
     ecran.blit(surface_texte, rect_texte)
 
-    # Effet de lueur si survol
     if est_survole:
         lueur = pygame.Surface((rect.width + 10, rect.height + 10), pygame.SRCALPHA)
         pygame.draw.rect(lueur, (150, 100, 150, 30), (0, 0, rect.width + 10, rect.height + 10), border_radius=15)
@@ -92,10 +86,9 @@ def afficher_menu(ecran):
         horloge.tick(60)
         largeur, hauteur = ecran.get_size()
 
-        # Redimensionner les frames
         frames_redim = [pygame.transform.scale(img, (largeur, hauteur)) for img in frames_originales]
 
-        # Polices adaptees
+        # Polices
         taille_police = max(28, int(hauteur * 0.055))
         police = pygame.font.Font(ASSETS / "fonts" / "Creepster-Regular.ttf", taille_police)
 
@@ -104,11 +97,10 @@ def afficher_menu(ecran):
         hauteur_btn = max(50, int(hauteur * 0.1))
         espacement_btn = int(hauteur * 0.025)
 
-        # Animation subtile des boutons
         temps_anim_bouton += 0.05
         decalage_bouton = math.sin(temps_anim_bouton) * 2
 
-        # Position des boutons (centres)
+        # Position des boutons
         centre_x = largeur // 2
         debut_y = int(hauteur * 0.4)
 
@@ -172,15 +164,14 @@ def afficher_menu(ecran):
         # Affichage du fond
         ecran.blit(frames_redim[index_frame], (0, 0))
 
-        # Overlay leger pour assombrir
         overlay = pygame.Surface((largeur, hauteur), pygame.SRCALPHA)
         overlay.fill((0, 0, 0, 50))
         ecran.blit(overlay, (0, 0))
 
-        # Affichage du titre en haut a droite (plus haut)
+        # titre
         if titre_frames:
-            marge_droite = 80  # 50px de plus vers la gauche
-            marge_haut = -85   # 50px de plus vers le haut
+            marge_droite = 80
+            marge_haut = -85  
             titre_img = titre_frames[titre_i]
             ecran.blit(titre_img, (largeur - titre_img.get_width() - marge_droite, marge_haut))
 
@@ -261,12 +252,11 @@ def afficher_pause(ecran, capture_fond):
         # Fond avec capture du jeu
         ecran.blit(capture_fond, (0, 0))
 
-        # Overlay sombre
         overlay = pygame.Surface((largeur, hauteur), pygame.SRCALPHA)
         overlay.fill((0, 0, 0, 180))
         ecran.blit(overlay, (0, 0))
 
-        # Panneau central
+        # Panneau
         largeur_panneau = int(largeur * 0.35)
         hauteur_panneau = int(hauteur * 0.55)
         rect_panneau = pygame.Rect(
@@ -327,7 +317,6 @@ def afficher_parametres(ecran):
         y_curseur = int(hauteur * 0.35)
         rect_curseur = pygame.Rect(x_curseur, y_curseur, largeur_curseur, hauteur_curseur)
 
-        # Position du pointeur du curseur
         x_pointeur = x_curseur + int(parametres.volume_musique * largeur_curseur)
         rect_pointeur = pygame.Rect(x_pointeur - 8, y_curseur - 6, 16, hauteur_curseur + 12)
 
@@ -390,7 +379,7 @@ def afficher_parametres(ecran):
         # Fond sombre
         ecran.fill((25, 15, 30))
 
-        # Panneau central
+        # Panneau
         largeur_panneau = int(largeur * 0.55)
         hauteur_panneau = int(hauteur * 0.75)
         rect_panneau = pygame.Rect(
@@ -414,10 +403,8 @@ def afficher_parametres(ecran):
         label_vol = police.render("Volume", True, (220, 200, 220))
         ecran.blit(label_vol, (centre_x - label_vol.get_width() // 2, y_curseur - 35))
 
-        # Fond du curseur
         pygame.draw.rect(ecran, (60, 40, 60), rect_curseur, border_radius=6)
 
-        # Remplissage du curseur
         largeur_rempli = int(parametres.volume_musique * largeur_curseur)
         rect_rempli = pygame.Rect(x_curseur, y_curseur, largeur_rempli, hauteur_curseur)
         pygame.draw.rect(ecran, (150, 100, 150), rect_rempli, border_radius=6)

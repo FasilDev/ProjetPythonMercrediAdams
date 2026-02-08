@@ -39,7 +39,6 @@ def afficher_boutique(ecran):
     while True:
         horloge.tick(60)
 
-        # Diminuer le timer du message
         if timer_message > 0:
             timer_message -= 1
         else:
@@ -50,7 +49,7 @@ def afficher_boutique(ecran):
         # Fond qui prend TOUT l'ecran (etire)
         fond_redim = pygame.transform.scale(fond_boutique, (largeur, hauteur))
 
-        # Polices adaptees a la taille
+        # Polices
         taille_police = max(18, int(hauteur * 0.04))
         taille_police_prix = max(14, int(hauteur * 0.03))
         taille_police_pieces = max(20, int(hauteur * 0.045))
@@ -65,10 +64,10 @@ def afficher_boutique(ecran):
         rect_violet_x = int(largeur * 0.52) + 300  # 300px vers la droite
         rect_violet_y = int(hauteur * 0.72) - 50   # 50px vers le haut
 
-        # Espacement entre les objets (reduit)
+        # Espacement entre les objets
         espacement = int(largeur * 0.08)
 
-        # Positions des 4 objets dans le rectangle violet (en ligne)
+        # Positions des 4 objets dans le rectangle violet
         positions = [
             (rect_violet_x - espacement * 1.5, rect_violet_y),
             (rect_violet_x - espacement * 0.5, rect_violet_y),
