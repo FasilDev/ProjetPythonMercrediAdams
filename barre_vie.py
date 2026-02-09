@@ -10,7 +10,6 @@ class BarreVie:
         self.largeur = largeur
         self.hauteur = hauteur
 
-        # Couleurs
         self.couleur_fond = (50, 50, 50)
         self.couleur_bordure = (255, 255, 255)
         self.couleur_vie = (180, 0, 0)
@@ -51,11 +50,9 @@ class BarreVie:
 
         pygame.draw.rect(ecran, self.couleur_fond, (x, y, self.largeur, self.hauteur))
 
-        # Barre de vie
         ratio_vie = self.vie_actuelle / self.vie_max
         largeur_vie = int(self.largeur * ratio_vie)
 
-        # Couleur selon le niveau de vie
         if ratio_vie < 0.3:
             couleur = self.couleur_vie_basse
         else:
