@@ -8,7 +8,6 @@ ASSETS = Path(__file__).parent / "assets"
 
 class Inventaire:
     def __init__(self):
-        # Charger les images des objets
         self.images = {
             "bougie": pygame.image.load(ASSETS / "boutique" / "Bougie_boutique.webp").convert_alpha(),
             "araignee": pygame.image.load(ASSETS / "boutique" / "Araignee_boutique.webp").convert_alpha(),
@@ -16,30 +15,25 @@ class Inventaire:
             "grimoire": pygame.image.load(ASSETS / "boutique" / "Grimoire_boutique.webp").convert_alpha()
         }
 
-        # Ordre des emplacements
         self.emplacements = ["bougie", "araignee", "violon", "grimoire"]
 
-        # Taille
         self.taille_emplacement = 50
         self.espacement = 5
 
-        # Police
         self.police = pygame.font.Font(ASSETS / "fonts" / "Creepster-Regular.ttf", 14)
 
-        # Effets actifs
         self.effets_actifs = {
-            "bougie": {"actif": False, "timer": 0, "duree": 600},      # ralenti
-            "araignee": {"actif": False, "timer": 0, "duree": 180},    # 3s invincibilite
-            "violon": {"actif": False, "timer": 0, "duree": 900},      # 15s double score
-            "grimoire": {"actif": False, "timer": 0, "duree": 1}       # Instantane
+            "bougie": {"actif": False, "timer": 0, "duree": 600},     
+            "araignee": {"actif": False, "timer": 0, "duree": 180},    
+            "violon": {"actif": False, "timer": 0, "duree": 900},      
+            "grimoire": {"actif": False, "timer": 0, "duree": 1}       
         }
 
-        # temps avant de pouvoir reutiliser un objet
         self.cooldowns = {
-            "bougie": {"timer": 0, "duree": 300},      # 5s de cooldown
-            "araignee": {"timer": 0, "duree": 600},    # 10s de cooldown
-            "violon": {"timer": 0, "duree": 300},      # 5s de cooldown
-            "grimoire": {"timer": 0, "duree": 180}     # 3s de cooldown
+            "bougie": {"timer": 0, "duree": 300},     
+            "araignee": {"timer": 0, "duree": 600},    
+            "violon": {"timer": 0, "duree": 300},      
+            "grimoire": {"timer": 0, "duree": 180}     
         }
 
     def utiliser_objet(self, index_emplacement):
@@ -99,7 +93,6 @@ class Inventaire:
             x = debut_x + i * (self.taille_emplacement + self.espacement)
             y = debut_y
 
-            # Fond de l'emplacement
             rect_emplacement = pygame.Rect(x, y, self.taille_emplacement, self.taille_emplacement)
 
             if self.effets_actifs[cle_objet]["actif"]:
@@ -121,11 +114,9 @@ class Inventaire:
                 img = pygame.transform.smoothscale(self.images[cle_objet], (self.taille_emplacement - 8, self.taille_emplacement - 8))
                 ecran.blit(img, (x + 4, y + 4))
 
-                # Nombre d'objets
                 texte_nombre = self.police.render(f"x{nombre}", True, (255, 255, 255))
                 ecran.blit(texte_nombre, (x + self.taille_emplacement - texte_nombre.get_width() - 2, y + self.taille_emplacement - texte_nombre.get_height()))
 
-            # Touche (configurable)
             nom_touche = parametres.obtenir_nom_touche(parametres.touches_objets[i])
             texte_touche = self.police.render(nom_touche, True, (255, 215, 0))
             ecran.blit(texte_touche, (x + 2, y + 2))
