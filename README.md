@@ -43,37 +43,86 @@ python main.py
 
 ## 📂 Structure du projet
 ```
-ProjetPython_MercrediAdams/
-├── main.py                    # Point d'entrée du jeu
-├── menu.py                    # Menu principal
-├── game.py                    # Logique du jeu
-├── sprites.py                 # Classes des personnages et objets
-├── boutique.py                # Système de boutique
-├── platform.py                # Gestion des plateformes
-├── coin.py                    # Gestion des pièces
-├── score.py                   # Système de score
-├── game_over.py               # Écran de fin de partie
-├── health_bar.py              # Barre de vie
-├── assets/                    # Ressources du jeu
-│   ├── boutique/              # Images de la boutique
-│   │   ├── Bougie_boutique.webp
-│   │   ├── Boutique_Wednesday.webp
-│   │   ├── Grimoire_boutique.webp
-│   │   └── Violon_boutique.webp
-│   ├── fonts/                 # Polices
-│   │   └── Creepster-Regular.ttf
-│   ├── menu/                  # Images du menu
-│   │   ├── menu_0.png
-│   │   └── menu_1.png
-│   ├── sounds/                # Sons et musique
-│   │   └── Cimetiere.mp3
-│   ├── bgmercredi.jpg         # Fond de jeu
-│   ├── corbeau.webp           # Obstacle
-│   ├── hyde.webp              # Obstacle
-│   ├── mercrediadam sprite...  # Sprite du personnage
-│   ├── spider.webp            # Obstacle
-│   └── Wednesday Addams ...   # Sprite du personnage
-└── README.md                  # Documentation du projet
+ProjetPythonMercrediAdams-main/
+│
+├── 📄 Fichiers Python Principaux
+│   ├── main.py                         # Point d'entrée du jeu
+│   ├── menu.py                         # Menu principal
+│   ├── personnages.py                  # Classes Joueur, Obstacle
+│   ├── boutique.py                     # Système de boutique
+│   ├── plateforme.py                   # Gestion des plateformes
+│   ├── piece.py                        # Gestion des pièces
+│   ├── score.py                        # Système de score
+│   ├── barre_vie.py                    # Barre de vie
+│   ├── fin_partie.py                   # Écran de fin de partie
+│   ├── donnees_joueur.py               # Données du joueur
+│   ├── inventaire.py                   # Système d'inventaire
+│   └── parametres.py                   # Paramètres du jeu
+│
+├── 📋 Fichiers de Configuration
+│   ├── parametres.json                 # Configuration du jeu
+│   ├── sauvegarde.json                 # Fichier de sauvegarde
+│   └── README.md                       # Documentation
+│
+├── 🗂️ __pycache__/                     # Cache Python (généré automatiquement)
+│   ├── barre_vie.cpython-311.pyc
+│   ├── boutique.cpython-311.pyc
+│   ├── donnees_joueur.cpython-311.pyc
+│   ├── fin_partie.cpython-311.pyc
+│   ├── inventaire.cpython-311.pyc
+│   ├── menu.cpython-311.pyc
+│   ├── parametres.cpython-311.pyc
+│   ├── personnages.cpython-311.pyc
+│   ├── piece.cpython-311.pyc
+│   ├── plateforme.cpython-311.pyc
+│   └── score.cpython-311.pyc
+│
+└── 📁 assets/                          # Ressources du jeu
+    │
+    ├── 🎨 Backgrounds (Fonds)
+    │   ├── bgmercredi.jpg              # Fond principal du jeu
+    │   └── bgmercredi1.webp            # Fond alternatif
+    │
+    ├── 🎭 Sprites Personnage Principal
+    │   ├── mercrediadamspritecouche.png    # Sprite couché
+    │   └── mercrediadamspritemarche.png    # Sprite en marche
+    │
+    ├── 👾 Sprites Obstacles
+    │   ├── hyde_sprite.png             # Obstacle Hyde
+    │   └── spider.webp                 # Araignée obstacle
+    │
+    ├── 💎 Sprites Pièces/Objets
+    │   ├── piquequifaitmal.png         # Pièce/piège (PNG)
+    │   ├── piquequifaitmal.webp        # Pièce/piège (WEBP)
+    │   └── ravenfly.png                # Corbeau volant
+    │
+    ├── 🛍️ boutique/                    # Images de la boutique
+    │   ├── Araignee_boutique.webp      
+    │   ├── Bougie_boutique.webp
+    │   ├── Boutique_Wednesday.webp
+    │   ├── Grimoire_boutique.webp
+    │   └── Violon_boutique.webp
+    │
+    ├── 🔤 fonts/                       # Polices
+    │   └── Creepster-Regular.ttf
+    │
+    ├── 📱 menu/                        # Images et animations du menu
+    │   ├── menu_0.png
+    │   ├── menu_1.png
+    │   └── titre/                      # Animation titre (91 frames)
+    │       ├── frame_00_delay-0.07s.gif
+    │       ├── frame_01_delay-0.06s.gif
+    │       ├── frame_02_delay-0.07s.gif
+    │       ├── ... (frames 03 à 89)
+    │       └── frame_90_delay-0.07s.gif
+    │
+    └── 🎵 Audio (Sons & Musique)
+        ├── Cimetiere.mp3                # Musique d'ambiance cimetière
+        ├── Crie.wav                     # Son de cri
+        ├── Game Over.wav                # Son de fin de partie
+        ├── cash.wav                     # Son de collecte de pièces
+        ├── Mercredi Addams soundplay.wav # Son de jeu
+        └── Wednesday Addams Dance.mp3    # Musique de danse
 ```
 
 ## 🎨 Fonctionnalités
@@ -99,7 +148,7 @@ ProjetPython_MercrediAdams/
 
 ## 🎵 Crédits
 - Police : Creepster (Google Fonts)
-- Musique : [Source]
-- Sons : [Source]
+- Musique : Cimetiere.mp3 et Wednesday Addamps Dance.mp3
+- Sons : Crie.wav / Game Over.wav / cash.wav / Mercredi Addams soundplay.wav (Easter Egg)
 - Inspiration : Série Mercredi
 
